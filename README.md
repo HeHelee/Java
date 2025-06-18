@@ -3,6 +3,7 @@
 ## 📚 학습 목차
 
 ### 📘 Day8
-- [이너 클래스와 인터페이스](./day8/innterclass&interface.md)  
+- [이너 클래스와 인터페이스](./day8/innterclass&interface.md)
+- [enum](./day8/enum.md)
 
 
