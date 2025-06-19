@@ -8,16 +8,14 @@
 #### 인스턴스 이너 클래스 객체 생성하기
 - 아우터 클래스 객체 내부에 이너 클래스가 정의되어있기 때문에 이너 클래스에 접근하기 위해서는 아우터 클래스의 객체를 먼저
   생성해야 한다.
-  ```
+   ```
   아우터 클래스 아우터 클래스 참조 변수 = new 아우터 클래스();
   아우터 클래스.이너 클래스 이너 클래스 참조 변수 = 아우터 클래스 참조 변수.new 이너 클래스();
-  ```
+   ```
 
 - 예시
   ```
-package day8_sec01_instanceinnerclass.EX01_CreateObjectAndAccessMember;
-
-class A {
+  class A {
 	public int a = 3;
 	protected int b = 4;
 	int c = 5;
@@ -26,8 +24,7 @@ class A {
 	void abc() {
 		System.out.println("A 클래스 메서드 abc()");
 	}
-
-	// 이너 클래스
+   // 이너 클래스
 	class B {
 		void bcd() {
 			// 아우터 클래스의 필드 사용
@@ -40,9 +37,9 @@ class A {
 			abc();
 		}
 	}
-}
+  }
 
-public class CreateObjectAndAccessMember {
+  public class CreateObjectAndAccessMember {
 
 	public static void main(String[] args) {
 		// 아우터 클래스 객체 생성
@@ -53,9 +50,9 @@ public class CreateObjectAndAccessMember {
 
 	}
 
-}
-```
-```
+  }
+  ```
+
 
 #### 아우터 클래스의 객체 참조하기
 - 외부 클래스와 이너 클래스에 동일한 이름의 필드나 메서드가 있을 때, 이너 클래스의 필드나 메서드가 참조된다.
