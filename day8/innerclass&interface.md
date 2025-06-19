@@ -14,7 +14,7 @@
   ```
 
 - 예시
-```
+  ```
 package day8_sec01_instanceinnerclass.EX01_CreateObjectAndAccessMember;
 
 class A {
@@ -55,6 +55,8 @@ public class CreateObjectAndAccessMember {
 
 }
 ```
+```
+
 #### 아우터 클래스의 객체 참조하기
 - 외부 클래스와 이너 클래스에 동일한 이름의 필드나 메서드가 있을 때, 이너 클래스의 필드나 메서드가 참조된다.
 - 참조 객체명을 생략할 때는 자기 자신의 객체를 가리키는 this 키워드를 컴파일러가 자동으로 추가하기 때문이다.
