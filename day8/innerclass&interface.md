@@ -59,3 +59,49 @@
 - 참조 객체명을 생략할 때는 자기 자신의 객체를 가리키는 this 키워드를 컴파일러가 자동으로 추가하기 때문이다.
 - 이너 클래스 내부에서 'this.'의 의미는 이너 클래스 자신이 된다.
 - 이너 클래스 내부에서 아우터 클래스의 멤버를 참조하고 싶을 때 '아우터 클래스명.this.' 를 사용한다.
+
+  ```
+  class A {
+	int a = 3;
+	int b = 4;
+	void abc() {
+		System.out.println("A 클래스 메서드");
+	}
+	//인스턴스 이너 클래스
+	class B {
+		int a = 5;
+		int b = 6;
+		void abc() {
+			System.out.println("B 클래스 메서드");
+		}
+		void bcd() {
+			//이너 클래스의 멤버 호출 또는 사용
+			System.out.println(a);
+			System.out.println(b);
+			abc();
+			
+			//아우터 클래스의 멤버 호출 또는 사용
+			System.out.println(A.this.a);
+			System.out.println(A.this.b);
+			A.this.abc();
+		}
+	}
+  }
+  public class UseMemberOfOuterClass {
+
+	public static void main(String[] args) {
+		// 아우터 클래스 객체 생성
+		A a = new A();
+		
+		// 이너 클래스 객체 생성
+		A.B b = a.new B();
+		b.bcd();
+	}
+  }
+ 
+
+  ```
+### 정적 멤버 이너 클래스
+- 정적 멤버 이너 클래스는 이너 클래스 앞에 static 키워드가 포함된 이너 클래스이다.
+- 정적 메서드와 동일하게 아우터 클래스의 정적 멤버에만 접근할 수 있다.
+  
