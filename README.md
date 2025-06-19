@@ -6,4 +6,5 @@
 - [이너 클래스와 인터페이스](./day8/innerclass&interface.md)
 - [enum](./day8/enum.md)
 
-
+### 📘 Day9
+-[쓰레드](./day8/thread.md)
