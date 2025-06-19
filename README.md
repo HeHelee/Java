@@ -7,4 +7,4 @@
 - [enum](./day8/enum.md)
 
 ### 📘 Day9
--[쓰레드](./day8/thread.md)
+- [쓰레드](./day8/thread.md)
