@@ -298,3 +298,214 @@ void setDeamon(boolean on)
 ```
 boolean isDeamon()
 ```
+- 쓰레드의 데몬 설정 (일반 쓰레드)
+```
+package sec03_threadproperties.EX03_ThreadProperties_3_1;
+
+class MyThread extends Thread {
+    @Override
+    public void run () {
+        System.out.println(getName() + ": " + (isDaemon()?"데몬 쓰레드":"일반 쓰레드"));
+        for (int i = 0; i < 6; i++) {
+            System.out.println(getName() + ": " + i + "초");
+            try{Thread.sleep(1000);}catch (InterruptedException e){}
+        }
+    }
+}
+
+public class ThreadProperties_3_1 {
+    public static void main(String[] args) {
+        
+        //일반  쓰레드
+        Thread thread1 = new MyThread();
+        thread1.setDaemon(false);
+        thread1.setName("thread1");
+        thread1.start();
+        
+        //3.5초 후 main 쓰레드 종료
+        try{Thread.sleep(3500);}catch (InterruptedException e) {}
+        System.out.println("main Thread 종료");
+        
+    }
+}
+
+```
+- 쓰레드의 데몬 설정 (데몬 쓰레드)
+```
+package sec03_threadproperties.EX03_ThreadProperties_3_1;
+
+class MyThread1 extends Thread {
+    @Override
+    public void run () {
+        System.out.println(getName() + ": " + (isDaemon()?"데몬 쓰레드":"일반 쓰레드"));
+        for (int i = 0; i < 6; i++) {
+            System.out.println(getName() + ": " + i + "초");
+            try{Thread.sleep(1000);}catch (InterruptedException e){}
+        }
+    }
+}
+public class ThreadProperties_3_2 {
+    public static void main(String[] args) {
+        //일반  쓰레드
+        Thread thread1 = new MyThread1();
+        thread1.setDaemon(true);
+        thread1.setName("thread1");
+        thread1.start();
+
+        //3.5초 후 main 쓰레드 종료
+        try{Thread.sleep(3500);}catch (InterruptedException e) {}
+        System.out.println("main Thread 종료");
+    }
+}
+```
+- 데몬 쓰레드는 주 쓰레드가 아니라 프로세스 내의 모든 일반 쓰레드가 종료되어야 종료된다.
+```
+class MyThread2 extends Thread {
+    @Override
+    public void run() {
+        System.out.println(getName() + ": " + (isDaemon()?"데몬 쓰레드":"일반 쓰레드"));
+        for (int i = 0; i < 6; i++) {
+            System.out.println(getName() + ": " + i + "초");
+            try {Thread.sleep(1000);}catch (InterruptedException e){}
+        }
+    }
+}
+public class ThreadProperties_3_3 {
+    public static void main(String[] args) {
+        //일반 쓰레드
+        Thread thread1 = new MyThread2();
+        thread1.setDaemon(false);
+        thread1.setName("thread1");
+        thread1.start();
+
+        //데몬 쓰레드
+        Thread thread2 = new MyThread2();
+        thread2.setDaemon(true);
+        thread2.setName("thread2");
+        thread2.start();
+        
+        //3.5초 후 main 쓰레드 종료
+        try {Thread.sleep(3500);}catch(InterruptedException e){}
+        System.out.println("main Thread 종료");
+    }
+}
+```
+### 쓰레드의 동기화
+#### 동기화란
+- 하나의 작업이 완전히 안료된 후 다른 작업을 수행하는 것을 말한다.
+#### 동기화가 필요한 이유
+- 멀티 쓰레드 환경에서 여러 쓰레드가 동일한 자원에 접근하거나 수정할 때 데이터의 일관성이 깨질 수 있습니다.
+- 예를 들어 은행 계좌에서 동시에 입출금을 처리하는 두개의 쓰레드가 있다고 가정하면 동기화 없이 작업이 수행될 경우, 계좌의 잔액이 잘못 계산될 수 있습니다.
+- 그래서 하나의 쓰레드가 자원을 사용하는 동안 다른 쓰레드가 동일한 자원에 접근하지 못하도록 보장합니다.
+### 동기화 방법
+#### 메서드 동기화
+- 2개의 쓰레드가 동시에 메서드를 실행할 수 없다는 것을 의미한다.
+- 메서드를 동기화하고자 할 때는 동기화하고자 하는 메서드의 리턴 타입 앞에 synchronized 키워드를 넣으면 된다.
+```
+접근 지정자 synchronized 리턴 타입 메서드명(입력매개변수) {
+  // 동기화가 필요한 코드
+}
+```
+```
+// 공유 객체
+class MyData {
+	int data = 3;
+	
+	public synchronized void plusData() {
+		int mydata = data; //데이터 가져오기
+		try {Thread.sleep(2000);} catch (InterruptedException e) {}
+		data = data + 1;
+	}
+}
+
+//공유 객체를 사용하는 쓰레드
+class PlusThread extends Thread {
+	MyData myData;
+	public PlusThread(MyData myData) {
+		this.myData = myData;
+	}
+	@Override
+	public void run() {
+		myData.plusData();
+		System.out.println(getName() + "실행 결과: " + myData.data );
+	}
+}
+
+public class TheNeedSynchronized {
+
+	public static void main(String[] args) {
+		//공유 객체 생성
+		MyData myData = new MyData();
+		
+		//PlusThread1
+	    Thread plusThread1 = new PlusThread(myData);
+	    plusThread1.setName("plusThread1");
+	    plusThread1.start();
+	    
+	    try {Thread.sleep(1000);}catch(InterruptedException e) {}
+	    
+	    //PlusThread2
+	    Thread plusThread2 = new PlusThread(myData);
+	    plusThread2.setName("plusThread2");
+	    plusThread2.start();
+
+	}
+
+}
+```
+#### 블록 동기화
+- 2개의 쓰레드가 동시에 해당 블록을 사용할 수 없다는 것을 의미한다.
+- 전체 메서드 중에 일부만 동기화가 필요할 경우 해당 부분만 동기화를 할 수 있는데 이를 '블록 동기화'라고 한다.
+```
+synchronized (임의의 객체) {
+}
+```
+- 여기서 임의의 객체는 어떤 객체도 올 수 있지만, 일반적으로 this를 넣어 자기 객체를 가리킨다.
+```
+class MyData {
+	int data = 3;
+	
+	public void plusData() {
+		synchronized (this) {
+			int mydata = data;
+			try {Thread.sleep(2000);}catch(InterruptedException e) {}
+			data = mydata+1;
+		}
+	}
+}
+//공유 객체를 사용하는 쓰레드
+class PlusThread extends Thread {
+	MyData myData;
+	public PlusThread(MyData myData) {
+		this.myData = myData;
+	}
+	@Override
+	public void run() {
+		myData.plusData();
+		System.out.println(getName() + "실행 결과: " + myData.data );
+	}
+}
+
+
+public class SynchronizedBlock {
+
+	public static void main(String[] args) {
+	MyData myData = new MyData();
+		
+		//PlusThread1
+	    Thread plusThread1 = new PlusThread(myData);
+	    plusThread1.setName("plusThread1");
+	    plusThread1.start();
+	    
+	    try {Thread.sleep(1000);}catch(InterruptedException e) {}
+	    
+	    //PlusThread2
+	    Thread plusThread2 = new PlusThread(myData);
+	    plusThread2.setName("plusThread2");
+	    plusThread2.start();
+
+
+	}
+
+}
+```
