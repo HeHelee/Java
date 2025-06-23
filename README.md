@@ -8,3 +8,9 @@
 
 ### 📘 Day9
 - [쓰레드](./day9/thread.md)
+
+### 📘 Day10
+- [제네릭](./day10/generic.md)
+
+### 📘 Day11
+- [컬렉션 프레임워크](./day11/collectionframework.md)
