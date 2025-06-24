@@ -510,3 +510,146 @@ public class SynchronizedBlock {
 }
 ```
 #### 동기화의 원리
+- 모든 객체는 자신만의 열쇠를 가지고 있다.
+- 한 시점에 하나의 쓰레드만 락을 가진 코드를 실행할 수 있다.
+- 다른 쓰레드는 해당 락이 풀릴 때까지 기다려야 한다.
+- 서로 다른 객체의 락은 독립적으로, 값은 같더라도 객체가 다르면, 각각의 락을 가지고 동시에 접근할 수 있다.
+
+- 3개의 동기화 영역이 동일한 열쇠로 동기화됐을 때
+```
+package src.day9_sec04_synchronizedmethodandblock.EX04_KeyObject_1;
+
+class MyData {
+	synchronized void abc() {
+		for (int i = 0; i < 3; i++) {
+			System.out.println(i + "sec");
+			try {Thread.sleep(1000);} catch(InterruptedException e) {}
+		}
+	}
+	synchronized void bcd() {
+		for (int i = 0; i < 3; i++) {
+			System.out.println(i + "초");
+			try {Thread.sleep(1000);} catch(InterruptedException e) {}
+		}
+	}
+	synchronized void cde() {
+		for (int i = 0; i < 3; i++) {
+			System.out.println(i + "번째");
+			try {Thread.sleep(1000);} catch(InterruptedException e) {}
+		}
+	}
+}
+
+public class KeyObject_1 {
+
+	public static void main(String[] args) {
+		//공유 객체
+		MyData myData = new MyData();
+		//3개의 쓰레드가 각각의 메서드 호출
+		new Thread() {
+			public void run() {
+				myData.abc();
+			};
+		}.start();
+		new Thread() {
+			public void run() {
+				myData.bcd();
+			}
+		}.start();
+		new Thread() {
+			public void run() {
+				myData.cde();
+			}
+ 		}.start();
+	}
+}
+```
+
+- 동기화 메서드와 동기화 블록이 다른 열쇠를 사용할 때
+```
+class MyData {
+	synchronized void abc() {
+		for (int i = 0; i < 3; i++) {
+			System.out.println(i + "sec");
+			try {Thread.sleep(1000);} catch(InterruptedException e) {}
+		}
+	}
+	synchronized void bcd() {
+		for (int i = 0; i < 3; i++) {
+			System.out.println(i + "초");
+			try {Thread.sleep(1000);} catch(InterruptedException e) {}
+		}
+	}
+    void cde() {
+		synchronized (new Object()) {
+			for (int i = 0; i < 3; i++) {
+				System.out.println(i + "번째");
+				try{Thread.sleep(1000);} catch (InterruptedException e) {}
+			}
+		}
+	}
+}
+
+public class KeyObject_1 {
+
+	public static void main(String[] args) {
+		//공유 객체
+		MyData myData = new MyData();
+		//3개의 쓰레드가 각각의 메서드 호출
+		new Thread() {
+			public void run() {
+				myData.abc();
+			};
+		}.start();
+		new Thread() {
+			public void run() {
+				myData.bcd();
+			}
+		}.start();
+		new Thread() {
+			public void run() {
+				myData.cde();
+			}
+ 		}.start();
+
+	}
+
+}
+```
+### 쓰레드의 상태
+- 각 쓰레드의 상태는 Thread.State 타입으로 정의되어 있다.
+- Thread의 인스턴스 메서드인 getState()로 가져올 수 있다.
+- 쓰레드의 상태를 Thread.State 타입에 저장된 문자열 상숫값 중 하나로 리턴한다.
+
+- 쓰레드의 상태 값 가져오기
+```
+Tread.State getState()
+```
+#### 쓰레드의 6가지 상태
+##### NEW, RUNNABLE, TERMINATED
+- 처음 객체가 생성되면 NEW 상태를 가진다.
+- 이후 start() 메서드로 실행되면 RUNNABLE 상태가 된다.
+- 실행 대기를 반복하면서 CPU를 다르 쓰레드들과 나눠서 사용한다.
+- 이후 run() 메서드가 종료되면 TERMINATED 상태가 된다.
+- RUNNABLE 상태에서는 TIMED_WATING, BLOCKED, WAITING 상태가 된다.
+
+##### TIMED_WAITING
+- 정적 메서드인 Thread.sleep(long millis) 또는 인스턴스 메서드인 join (long mills)가 호출되면 쓰레드는 TIME_WAITING 상태가 된다.
+- 만일 일시정지 시간이 지나거나 외부에서 interrupt() 메서드가 호출되면 다시 RUNNABLE 상태가 된다.
+- 그러면 Thread.sleep(long millis)와 join (long mills)의 차이점은 무엇일까?
+- 예를 들어 쓰레드 A에서 Thread.sleep(1000)을 실행했다면 쓰레드 A는 외부에서 interrupt() 메서드가 호출되지 않는 한 1초 동안 일시정지 상태가 된다.
+- 반면, '쓰레드 B 객체.join(1000)을 실행하게 된다면 쓰레드 A는 일시정지 되고 그동안 쓰레드 B가 실행된다.
+
+##### BLOCKED
+- 동기화 메서드 또는 동기화 블록을 실행하기 위해 먼저 실행 중인 쓰레드의 실행 완료를 기다리는 상태다.
+- 앞의 쓰레드의 동기화 수행이 완료되면 BLOCKED 상태의 쓰레드는 RUNNABLE 상태가 된다.
+
+##### WAITING
+- 시간 정보가 없는 join()메서드가 호출되거나 wait() 메서드가 호출되면 WAITING 상태가 된다.
+- join() 메서드로 호출로 WAITING 상태가 됐을 때 TIMED_WAITING의 상태와 마찬가지로 join()의 대상이 된 쓰레드가 종료되거나 외부에서 interrupt() 메서드가 호출되면 다시 RUNNABLE 상태로 돌아간다.
+- wait() 메서드의 호출로 WAITING 상태가 됐을 떄는 Object 클래스의 notify() 또는 notifyAll() 메서드를 이용해 RUNNABLE 상태로 되돌아간다.
+- 다만 wait(), notify(), notifyAll()은 동기화 블록 내에서만 사용할 수 있다.
+
+#### NEW, RUNNABLE, TERMINATED
+
+  
