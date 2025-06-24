@@ -650,6 +650,52 @@ Tread.State getState()
 - wait() 메서드의 호출로 WAITING 상태가 됐을 떄는 Object 클래스의 notify() 또는 notifyAll() 메서드를 이용해 RUNNABLE 상태로 되돌아간다.
 - 다만 wait(), notify(), notifyAll()은 동기화 블록 내에서만 사용할 수 있다.
 
-#### NEW, RUNNABLE, TERMINATED
+#### Thread.yield()란?
+- RUNNABLE 상태에서는 쓰레드 간의 동시성에 따라 실행과 실행 대기를 반복한다.
+- Thread.yield()는 정적 메서드로 yield()를 호출하면 다른 쓰레드에게 CPU 사용을 인위적으로 양보하고, 자신은 실행 대기 상태로 전환할 수 있다.
+```
+class MyThread extends Thread {
+	boolean yieldFlag;
+	@Override
+	public void run() {
+		while(true) {
+			if(yieldFlag) {
+				try {
+					Thread.sleep(500);
+				}catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}else {
+				System.out.println(getName() + " 실행");
+				for (long i = 0; i < 1000000000L; i++) {} //시간 지연
+			}
+		}
+	}
+}
+
+public class YieldInRunnableState {
+
+	public static void main(String[] args) {
+		MyThread thread1 = new MyThread();
+		thread1.setName("thread1");
+		thread1.yieldFlag = false;
+		thread1.setDaemon(true);
+		thread1.start();
+		
+		MyThread thread2 = new MyThread();
+		thread2.setName("thread2");
+		thread2.yieldFlag = false;
+		thread2.setDaemon(true);
+		thread2.start();
+		
+		//6초 지연
+		for (int i = 0; i < 6; i++) {
+			try {Thread.sleep(1000);} catch (InterruptedException e) {}
+			thread1.yieldFlag = !thread1.yieldFlag;
+			thread2.yieldFlag = !thread2.yieldFlag;
+		}
+	}
+}
+```
 
   
