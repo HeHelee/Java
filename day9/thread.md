@@ -509,3 +509,4 @@ public class SynchronizedBlock {
 
 }
 ```
+#### 동기화의 원리
