@@ -112,8 +112,7 @@ public class UserDAO {
 	public User findByUsername(String username) throws SQLException {
 	    String searchSQL = UserSQL.SELECT_SQL;
 	    try (Connection conn = getConnection(); PreparedStatement pstmt = conn.prepareStatement(searchSQL)) {
-	        System.out.println(">>> 실행된 쿼리: " + searchSQL);
-	        System.out.println(">>> 검색할 username: " + username);
+	 
 
 	        pstmt.setString(1, username);
 
@@ -121,9 +120,7 @@ public class UserDAO {
 	        if (rs.next()) {
 	            return new User(rs.getString("USERNAME"), rs.getString("PASSWORD"), rs.getString("NAME"),
 	                    rs.getString("EMAIL"), rs.getInt("BIRTH"));
-	        } else {
-	            System.out.println(">>> 결과 없음 (rs.next() = false)");
-	        }
+	        } 
 	        return null;
 	    }
 	}

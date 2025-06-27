@@ -74,7 +74,8 @@ public class UserService {
 	        }
 	        return user;
 	    } catch (SQLException e) {
-	        throw new Exception(MessageUtil.get("error.user.select"), e);
+	        e.printStackTrace();
+	        return null;
 	    }
 	}
 }

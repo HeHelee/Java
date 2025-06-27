@@ -152,8 +152,6 @@ public class MembershipManagement {
 		   }else {
 			   System.out.println("회원 탈퇴에 실패했습니다.");
 		   }
-			
-	
 		}
 	}
 
@@ -166,11 +164,10 @@ public class MembershipManagement {
 	        if (user != null) {
 	            System.out.println("아이디: " + user.getUsername());
 	            System.out.println("이름: " + user.getName());
+	            System.out.println("비밀번호: " + user.getPassword());
 	            System.out.println("이메일: " + user.getEmail());
 	            System.out.println("생년: " + user.getBirthYear());
-	        } else {
-	            System.out.println("해당 사용자를 찾을 수 없습니다.");
-	        }
+	        } 
 	    } catch (Exception e) {
 	        System.out.println(e.getMessage());
 	    }
