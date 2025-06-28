@@ -199,7 +199,260 @@ public class AvailableMethodInGenericMethod {
 }
 ```
 #### 제네릭 타입 범위 제한
+##### 제네릭 타입 범위 제한의 필요성
+- 타입 안전성을 보장해준다.
+- 특정 타입이나 특정 하위 타입만 보장해줌으로써 의도한 범위 내에서만 사용할 수 있도록 제어할 수 있다.
+- 제약이 없으면 메서드 내에서 형변환이 필요하지만 제약이 있으면 안전하게 타입 메서드를 호출할 수 있다.
+##### 제네릭 타입 범위 재한의 종류와 타입 범위 제한 방법
+- 제네릭 클래스에서 제네릭 타입을 제한할 때
+- 제네릭 메서드에서 제네릭 타입을 제한할 때
+- 일반 매개변수로서 제네릭 클래스의 타입을 제한할 때
+
+##### 제네릭 클래스에서 제네릭 타입을 제한할 때
+```
+접근지정자 class 클래스명 <T extends 최상위 클래스 / 인터페이스>
+```
+- 예를 들어, <T extends Fruits>와 같이 작성하면, Fruit 객체 또는 Fruit의 자식 클래스 객체만 대입할 수 있다.
+- 이때 주의해야 할 점은 extends의 키워드는 상속에서 사용한 것처럼 '상속하라'의 의미가 아니라 '최상위 클래스/인터페이스로 저장한다.' 의 의미를 갖는다.
+```
+class A {
+}
+
+class B extends A {
+}
+
+class C extends B {
+}
+
+class D<T extends B> {
+	private T t;
+
+	public T get() {
+		return t;
+	}
+
+	public void set(T t) {
+		this.t = t;
+	}
+}
+
+public class BoundedTypeOfGenericClass {
+
+	public static void main(String[] args) {
+		// D<A> d1 = new D<>(); //불가능
+		D<B> d2 = new D<>();
+		D<C> d3 = new D<>();
+		D d4 = new D();
+		
+		d2.set(new B());
+		d2.set(new C());
+		
+		//d3.set(new B());
+		d3.set(new C());
+		d4.set(new B());
+		d4.set(new C());
+
+	}
+
+}
+```
+##### 제네릭 메서드의 타입 제한
+```
+접근지정자 <T extends 최상위 클래스/인터페이스명> T 메서드명(T t) {
+}
+```
+- 제네릭 메서드에서 중요한 것은 메서드 내부에서 사용할 수 있는 메서드의 종류다.
+- 타입을 제한하지 않을 때는 모든 타입의 최상위 클래스인 Object만 사용할 수 있었다.
+- 하지만 같은 원리로 <T extends String>과 같이 표현하면 모든 타입의 최상위 타입이 String이기 때문에 해당 제네릭 메서드의 내부에서는
+  String 객체의 멤버를 사용할 수 있는 것이다.
+```
+class A {
+	public <T extends Number> void method1(T t) {
+		System.out.println(t.intValue());
+	}
+}
+
+interface MyInterface {
+	public abstract void print();
+}
+
+class B {
+	public <T extends MyInterface> void method1(T t) {
+		t.print();
+	}
+}
+
+public class BoundedTypeOfGenericMethod {
+
+	public static void main(String[] args) {
+		A a = new A();
+		a.method1(5.8);
+
+		B b = new B();
+		b.method1(new MyInterface() {
+			@Override
+			public void print() {
+				System.out.println("print() 구현");
+			}
+
+		});
+
+	}
+
+}
+```
+##### 메서드 매개변수일 때 제네릭 클래스의 타입 제한
+```
+1. 리턴 타입 메서드명 (제네릭 클래스명 <객체의 타입명> 참조 변수명) {} // 해당 객체만 가능
+2. 리턴 타입 메서드명 (제네릭 클래스명 <?> 참조 변수명) {} //모든 타입인 객체 가능
+3. 리턴 타입 메서드명 (제네릭 클래스명 <? extends 상위 클래스/ 인터페이스> 참조 변수명) {} //B 또는 B의 자식 클래스인 객체만 가능
+4. 리턴 타입 메서드명 (제네릭 클래스명 <? super 하위 클래스 / 인터페이스> 참조 변수명) {} //B 또는 B의 부모 클래스인 객체만 가능
+```
+```
+class A {}
+class B extends A {}
+class C extends B {}
+class D extends C {}
+
+class Goods<T> {
+	private T t;
+	public T get() {
+		return t;
+	}
+	public void set(T t) {
+		this.t = t;
+	}
+}
+
+class Test {
+	void method1(Goods<A> g) {}
+	void method2(Goods<?> g) {}
+	void method3(Goods<? extends B> g) {}
+	void method4(Goods<? super B> g) {}
+}
+
+public class BoundedTypeOfInputArguments {
+
+	public static void main(String[] args) {
+		Test t = new Test();
+		
+		//case1 
+		t.method1(new Goods<A>());
+//		t.method1(new Goods<B>());
+//		t.method1(new Goods<C>());
+//		t.method1(new Goods<D>());
+		
+		//case2
+		t.method2(new Goods<A>());
+		t.method2(new Goods<B>());
+		t.method2(new Goods<C>());
+		t.method2(new Goods<D>());
+		
+		//case3
+//		t.method3(new Goods<A>());
+		t.method3(new Goods<B>());
+		t.method3(new Goods<C>());
+		t.method3(new Goods<D>());
+		
+		//case4
+		t.method4(new Goods<A>());
+		t.method4(new Goods<B>());
+//		t.method4(new Goods<C>());
+//		t.method4(new Goods<D>());
+		
+		
+
+	}
+
+}
+```
+#### 제네릭의 상속
+##### 제네릭 클래스의 상속
+- 부모 클래스가 제네릭 클래스일 때, 이를 상속한 자식 클래스도 제네릭 클래스가 된다.
+- 즉, 제니릭 타입 변수를 가진 자식 클래스가 그대로 물려받게 된다.
+- 또한 자식 클래스는 제네릭 타입 변수를 추가해 정의해줄 수 있다.
+- 따라서 자식 클래스의 제네릭 타입 변수의 개수는 항상 부모보다 같거나 많을 것이다.
+```
+class Parent<T> {
+	T t;
+	public T getT() {
+		return t;
+	}
+	public void setT (T t) {
+		this.t = t;
+	}
+}
+
+class Child1<T> extends Parent<T> {
+	
+}
+
+class Child2<T,V> extends Parent<T> {
+	V v;
+	public V getV() {
+		return v;
+	}
+	public void setV(V v) {
+		this.v = v;
+	}
+	
+}
 
 
+public class InheritanceGenericClass {
 
+	public static void main(String[] args) {
+		// 부모 제네릭 클래스
+		Parent<String> p = new Parent<>();
+		p.setT("부모 제네릭 클래스");
+		System.out.println(p.getT());
+		
+		//자식 클래스1
+		Child1<String> c1 = new Child1<>();
+		c1.setT("자식 1 제네릭 클래스");
+		System.out.println(c1.getT());
+		
+		//자식 클래스2
+		Child2<String, Integer> c2 = new Child2<>();
+		c2.setT("자식 2 제네릭 클래스");
+		c2.setV(100);
+		System.out.println(c2.getT());
+		System.out.println(c2.getV());
 
+	}
+
+}
+
+```
+##### 제네릭 메서드의 상속
+- 제네릭 메서드를 포함한 일반 클래스를 상속해 자식 클래스를 생성할 때도 부모 클래스 내의 제네릭 메서드는 그대로 자식 클래스로 상속된다.
+```
+class Parent {
+	<T extends Number> void print(T t) {
+		System.out.println(t);
+	}
+}
+
+class Child extends Parent {
+
+}
+
+public class InheritanceGenericMethod {
+
+	public static void main(String[] args) {
+
+		// 부모 클래스에서 제네릭 메서드 이용
+		Parent p = new Parent();
+		p.<Integer>print(10);
+		p.print(10);
+
+		// 자식 클래스에서 제네릭 메서드 이용
+		Child c = new Child();
+		c.<Double>print(5.8);
+		c.print(5.8);
+
+	}
+
+}
+```
+  
