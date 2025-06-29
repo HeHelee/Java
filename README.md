@@ -2,6 +2,9 @@
 
 ## 📚 학습 목차
 
+### 📘 Day7
+- [예외 처리](./day7/exception.md)
+
 ### 📘 Day8
 - [추상 클래스와 인터페이스](./day8/abstractclass&interface.md)
 - [이너 클래스와 인터페이스](./day8/innerclass&interface.md)
